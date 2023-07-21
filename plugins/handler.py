@@ -1,19 +1,15 @@
 import re
-
 from pyrogram import Client, filters
 from pyrogram.types import Message, CallbackQuery
-
 from plugins import Database, Helper
 from plugins.command import *
 from bot import Bot
-
 
 @Bot.on_message()
 async def on_message(client: Client, msg: Message):
     if msg.chat.type == enums.ChatType.PRIVATE:
         if msg.from_user is None:
             return
-
         else:
             uid = msg.from_user.id
         helper = Helper(client, msg)
@@ -31,14 +27,11 @@ async def on_message(client: Client, msg: Message):
         if not database.get_data_bot(client.id_bot).bot_status:
             status = [
                 'member', 'banned', 'talent', 'daddy sugar', 'moans girl',
-                'moans boy', 'girlfriend rent', 'boyfriend rent'
+                'moans boy', 'girlfriend rent', 'boyfriend rent', 'rekber'
             ]
             member = database.get_data_pelanggan()
             if member.status in status:
                 return await client.send_message(uid, "<i>Saat ini bot sedang dinonaktifkan</i>", enums.ParseMode.HTML)
-
-        # anu = msg.caption if not msg.text else msg.text
-        # print(f"-> {anu}")
 
         command = msg.text or msg.caption
         if command is None:
@@ -147,13 +140,17 @@ async def on_message(client: Client, msg: Message):
                 if member.status in ['admin', 'owner']:
                     return await unban_handler(client, msg)
 
+            elif re.search(r"^[\/]addrekber", command):  # menambahkan rekber baru
+                if uid == config.id_admin:
+                    return await tambah_rekber_handler(client, msg)
+
             if x := re.search(fr"(?:^|\s)({config.hastag})", command.lower()):
                 key = x[1]
                 hastag = config.hastag.split('|')
                 member = database.get_data_pelanggan()
                 if member.status == 'banned':
                     return await msg.reply(f'Kamu telah <b>di banned</b>\n\n<u>Alasan:</u> {database.get_data_bot(client.id_bot).ban[str(uid)]}\nsilahkan kontak @OwnNeko untuk unbanned', True, enums.ParseMode.HTML)
-                if key in [hastag[0], hastag [1]]:
+                if key in [hastag[0], hastag[1]]:
                     return (
                         await msg.reply(
                             '🙅🏻‍♀️  post gagal terkirim, <b>mengirim pesan wajib lebih dari 3 kata.</b>',
@@ -192,8 +189,6 @@ async def on_message(client: Client, msg: Message):
             uid = msg.from_user.id
         if command != None:
             return
-
-
 
 @Bot.on_callback_query()
 async def on_callback_query(client: Client, query: CallbackQuery):
