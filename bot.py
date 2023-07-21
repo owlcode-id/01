@@ -1,7 +1,6 @@
 import config, sys, os, requests
-
 from plugins import Database
-from pyrogram import Client, enums
+from pyrogram import Client
 from pyrogram.types import BotCommand, BotCommandScopeAllPrivateChats
 
 data = []
@@ -17,6 +16,10 @@ class Bot(Client):
             },
             bot_token=config.bot_token
         )
+
+    async def rekber_command(self, message):
+        await message.reply_text("This is the rekber command response.")
+
     async def start(self):
         await super().start()
         bot_me = await self.get_me()
@@ -62,15 +65,15 @@ class Bot(Client):
             BotCommand('status', '🍃 check status'), BotCommand('talent', '👙 talent konten / vcs'),
             BotCommand('daddysugar', '👔 daddy sugar trusted'), BotCommand('moansgirl', '🧘‍♀️ moans girl'),
             BotCommand('moansboy', '🧘 moans boy'), BotCommand('gfrent', '🤵 girl friend rent'),
-            BotCommand('bfrent', '🤵 boy friend rent')
+            BotCommand('bfrent', '🤵 boy friend rent'), BotCommand('rekber', '🏦 rekber service')
         ], BotCommandScopeAllPrivateChats())
 
         print('BOT TELAH AKTIF')
-    
+
     async def stop(self):
         await super().stop()
         print('BOT BERHASIL DIHENTIKAN')
-    
+
     async def kirim_pesan(self, x: str):
         db = Database(config.id_admin).get_pelanggan()
         pesan = f'<b>TOTAL USER ( {db.total_pelanggan} ) PENGGUNA 📊</b>\n'
@@ -80,3 +83,5 @@ class Bot(Client):
         a = requests.get(f'{url}/sendMessage?chat_id={config.channel_log}&text={pesan}&parse_mode=HTML').json()
         requests.post(f'{url}/pinChatMessage?chat_id={config.channel_log}&message_id={a["result"]["message_id"]}&parse_mode=HTML')
         requests.post(f'{url}/deleteMessage?chat_id={config.channel_log}&message_id={a["result"]["message_id"] + 1}&parse_mode=HTML')
+
+
